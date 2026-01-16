@@ -1,6 +1,6 @@
 import comet_ml
 # TODO: ENTER YOUR API KEY HERE!! instructions above
-COMET_API_KEY = "2Jpo9Xzr0wTQEtmxYeDRB42u5"
+COMET_API_KEY = ""
 
 # Import PyTorch and other relevant libraries
 import torch
@@ -38,3 +38,16 @@ char2idx = {u: i for i, u in enumerate(vocab)}
 #   the inverse of char2idx and allows us to convert back
 #   from unique index to the character in our vocabulary.
 idx2char = np.array(vocab)
+
+'''TODO: Write a function to convert the all songs string to a vectorized
+    (i.e., numeric) representation. Use the appropriate mapping
+    above to convert from vocab characters to the corresponding indices.
+
+  NOTE: the output of the `vectorize_string` function
+  should be a np.array with `N` elements, where `N` is
+  the number of characters in the input string
+'''
+def vectorize_string(string):
+  '''TODO'''
+
+vectorized_songs = vectorize_string(songs_joined)
