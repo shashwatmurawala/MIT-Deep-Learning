@@ -116,6 +116,3 @@ pred = model(x)
 sampled_indices = torch.multinomial(torch.softmax(pred[0], dim=-1), num_samples=1)
 sampled_indices = sampled_indices.squeeze(-1).cpu().numpy()
 sampled_indices
-print("Input: \n", repr("".join(idx2char[x[0].cpu()])))
-print()
-print("Next Char Predictions: \n", repr("".join(idx2char[sampled_indices])))
