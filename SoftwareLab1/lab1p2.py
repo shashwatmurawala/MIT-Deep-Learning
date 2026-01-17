@@ -64,14 +64,58 @@ def get_batch(vectorized_songs, seq_length, batch_size):
 
     return x_batch, y_batch
 
-# Perform some simple tests to make sure your batch function is working properly!
-test_args = (vectorized_songs, 10, 2)
-x_batch, y_batch = get_batch(*test_args)
-assert x_batch.shape == (2, 10), "x_batch shape is incorrect"
-assert y_batch.shape == (2, 10), "y_batch shape is incorrect"
-x_batch, y_batch = get_batch(vectorized_songs, seq_length=5, batch_size=1)
+### Defining the RNN Model ###
 
-for i, (input_idx, target_idx) in enumerate(zip(x_batch[0], y_batch[0])):
-    print("Step {:3d}".format(i))
-    print("  input: {} ({:s})".format(input_idx, repr(idx2char[input_idx.item()])))
-    print("  expected output: {} ({:s})".format(target_idx, repr(idx2char[target_idx.item()])))
+'''TODO: Add LSTM and Linear layers to define the RNN model using nn.Module'''
+class LSTMModel(nn.Module):
+    def __init__(self, vocab_size, embedding_dim, hidden_size):
+        super(LSTMModel, self).__init__()
+        self.hidden_size = hidden_size
+
+        # Define each of the network layers
+        # Layer 1: Embedding layer to transform indices into dense vectors
+        #   of a fixed embedding size
+        self.embedding = nn.Embedding(vocab_size, embedding_dim)
+
+        '''TODO: Layer 2: LSTM with hidden_size `hidden_size`. note: number of layers defaults to 1.
+         Use the nn.LSTM() module from pytorch.'''
+        self.lstm = nn.LSTM(embedding_dim, hidden_size, batch_first=True) # TODO
+
+        '''TODO: Layer 3: Linear (fully-connected) layer that transforms the LSTM output
+        #   into the vocabulary size.'''
+        self.fc = nn.Linear(hidden_size, vocab_size) # TODO
+    def init_hidden(self, batch_size, device):
+        # Initialize hidden state and cell state with zeros
+        return (torch.zeros(1, batch_size, self.hidden_size).to(device),
+                torch.zeros(1, batch_size, self.hidden_size).to(device))
+
+    def forward(self, x, state=None, return_state=False):
+        x = self.embedding(x)
+
+        if state is None:
+            state = self.init_hidden(x.size(0), x.device)
+        out, state = self.lstm(x, state)
+
+        out = self.fc(out)
+        return out if not return_state else (out, state)
+    
+vocab_size = len(vocab)
+embedding_dim = 256
+hidden_size = 1024
+batch_size = 8
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model = LSTMModel(vocab_size, embedding_dim, hidden_size).to(device)
+# Test the model with some sample data
+x, y = get_batch(vectorized_songs, seq_length=100, batch_size=32)
+x = x.to(device)
+y = y.to(device)
+
+pred = model(x)
+sampled_indices = torch.multinomial(torch.softmax(pred[0], dim=-1), num_samples=1)
+sampled_indices = sampled_indices.squeeze(-1).cpu().numpy()
+sampled_indices
+print("Input: \n", repr("".join(idx2char[x[0].cpu()])))
+print()
+print("Next Char Predictions: \n", repr("".join(idx2char[sampled_indices])))
