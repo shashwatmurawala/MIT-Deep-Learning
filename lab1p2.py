@@ -166,15 +166,11 @@ sampled_indices
 ### compute the loss on the predictions from the untrained model from earlier. ###
 y.shape  # (batch_size, sequence_length)
 pred.shape  # (batch_size, sequence_length, vocab_size)
-example_batch_loss = compute_loss(y, pred) # TODO
+example_batch_loss = compute_loss(y, pred)
 
 # Move the model to the GPU
 model.to(device)
 
-'''TODO: instantiate an optimizer with its learning rate.
-  Checkout the PyTorch website for a list of supported optimizers.
-  https://pytorch.org/docs/stable/optim.html
-  Try using the Adam optimizer to start.'''
 optimizer = optim.Adam(model.parameters(), lr=params["learning_rate"])
 
 def train_step(x, y):
@@ -201,8 +197,7 @@ def train_step(x, y):
 def generate_text(model, start_string, generation_length=1000):
   # Evaluation step (generating ABC text using the learned RNN model)
 
-  '''TODO: convert the start string to numbers (vectorize)'''
-  input_idx = [char2idx[char] for char in start_string] # TODO
+  input_idx = [char2idx[char] for char in start_string]
   input_idx = torch.tensor([input_idx], dtype=torch.long).to(device)
 
   # Initialize the hidden state
@@ -213,18 +208,13 @@ def generate_text(model, start_string, generation_length=1000):
   tqdm._instances.clear()
 
   for i in tqdm(range(generation_length)):
-    '''TODO: evaluate the inputs and generate the next character predictions'''
-    predictions, state = model(input_idx, state, return_state=True) # TODO
+    predictions, state = model(input_idx, state, return_state=True)
 
     # Remove the batch dimension
     predictions = predictions.squeeze(0)
+    input_idx = torch.multinomial(torch.softmax(predictions, dim=-1), num_samples=1)
 
-    '''TODO: use a multinomial distribution to sample over the probabilities'''
-    input_idx = torch.multinomial(torch.softmax(predictions, dim=-1), num_samples=1) # TODO
-
-    '''TODO: add the predicted character to the generated text!'''
-    # Hint: consider what format the prediction is in vs. the output
-    text_generated.append(idx2char[input_idx.item()]) # TODO
+    text_generated.append(idx2char[input_idx.item()])
   return (start_string + ''.join(text_generated))
 
 ##################
@@ -263,7 +253,7 @@ for iter in tqdm(range(params["num_training_iterations"])):
 torch.save(model.state_dict(), checkpoint_prefix)
 experiment.flush()
 
-generated_text = generate_text(model, start_string="X", generation_length=1000) # TODO
+generated_text = generate_text(model, start_string="X", generation_length=1000)
 
 generated_songs = mdl.lab1.extract_song_snippet(generated_text)
 

@@ -2,8 +2,6 @@ import torch
 import torch.nn as nn
 import gymnasium as gym
 
-#import mitdeeplearning as mdl
-
 import numpy as np
 import matplotlib.pyplot as plt
 def func(a, b):
@@ -28,7 +26,6 @@ class OurDenseLayer(torch.nn.Module):
 class LinearWithSigmoidActivation(nn.Module):
     def __init__(self, num_inputs, num_outputs):
         super(LinearWithSigmoidActivation, self).__init__()
-        '''TODO: define a model with a single Linear layer and sigmoid activation.'''
         self.linear = nn.Linear(num_inputs, num_outputs)
         self.activation = nn.Sigmoid()
 
@@ -42,8 +39,6 @@ class LinearButSometimesIdentity(nn.Module):
         super(LinearButSometimesIdentity, self).__init__()
         self.linear = nn.Linear(num_inputs, num_outputs)
 
-    '''TODO: Implement the behavior where the network outputs the input, unchanged,
-        under control of the isidentity argument.'''
     def forward(self, inputs, isidentity=False):
         if isidentity:
             return inputs
